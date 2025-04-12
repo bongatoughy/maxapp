@@ -1,42 +1,41 @@
-// src/AuthContext.js or .tsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext({
-  tokens: "",
-  isAuthenticated: false,
+  user: null,
+  accessToken: "",
   login: (val: string) => {},
   logout: () => {},
 });
 
+export const SESSION_STORAGE_ACCESS_TOKEN_KEY = "accessToken";
+
 export const AuthProvider = ({ children }) => {
-  const [tokens, setTokens] = useState(
-    () => sessionStorage.getItem("auth") || ""
+  const [accessToken, setAccessToken] = useState(
+    () => sessionStorage.getItem(SESSION_STORAGE_ACCESS_TOKEN_KEY) || ""
   );
-  const [isAuthenticated, setIsAuthenticated] = useState(!!tokens);
 
   useEffect(() => {
-    if (tokens && Object.keys(tokens).length !== 0) {
-      sessionStorage.setItem("auth", tokens);
-      setIsAuthenticated(true);
+    if (accessToken) {
+      sessionStorage.setItem(SESSION_STORAGE_ACCESS_TOKEN_KEY, accessToken);
     } else {
-      sessionStorage.removeItem("auth");
-      setIsAuthenticated(false);
+      sessionStorage.removeItem(SESSION_STORAGE_ACCESS_TOKEN_KEY);
     }
-  }, [tokens]);
+  }, [accessToken]);
 
-  const login = (newToken) => {
-    setTokens(newToken);
+  const login = (newAccessToken) => {
+    setAccessToken(newAccessToken);
   };
 
   const logout = () => {
-    setTokens("");
+    setAccessToken("");
+    sessionStorage.removeItem(SESSION_STORAGE_ACCESS_TOKEN_KEY);
   };
 
   return (
     <AuthContext.Provider
       value={{
-        tokens: tokens || "",
-        isAuthenticated,
+        user: null,
+        accessToken,
         login,
         logout,
       }}

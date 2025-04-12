@@ -32,7 +32,6 @@ import Typography from "@mui/material/Typography";
 
 //Icons Imports
 import { AccountCircle, Send } from "@mui/icons-material";
-import { data } from "react-router";
 import { useAuth } from "./AuthContext";
 import React from "react";
 
@@ -53,23 +52,22 @@ export type Employee = {
 const LAMBDA_GET_ASSIGNEES_URL = `https://y2sbjsb3mxleav4dlpqhpcsyla0zpovf.lambda-url.us-east-1.on.aws`;
 const LAMBDA_CREATE_ASSIGNEE_URL = `https://bwn3rit6uu6ddsybygykwcwtga0cwwbq.lambda-url.us-east-1.on.aws`;
 
-const Example = memo(({ projects, setProjects }) => {
+const Example = memo(({ projects, setProjects, isFetchingProjects }) => {
   const [open, setOpen] = useState(false);
   const [selectedAssignees, setSelectedAssignees] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
-  const { tokens } = useAuth();
+  const { accessToken } = useAuth();
   const [assigneeDialogOpen, setAssigneeDialogOpen] = useState(false);
   const [isFetchingAssignees, setIsFetchingAssignees] = useState(false);
 
   const handleRowClick = async ({ row }) => {
-    console.log("HHHHHHHHHH" + "      " + row);
     setSelectedProject(row.original.id);
     setIsFetchingAssignees(true);
     const response = await fetch(LAMBDA_GET_ASSIGNEES_URL, {
       method: "POST",
       body: JSON.stringify({ projectId: row.original.id }),
       headers: {
-        authorization: `Bearer ${tokens}`,
+        authorization: `Bearer ${accessToken}`,
       },
     });
 
@@ -99,7 +97,7 @@ const Example = memo(({ projects, setProjects }) => {
       method: "POST",
       body: JSON.stringify({ email, projectId: selectedProject }),
       headers: {
-        authorization: `Bearer ${tokens}`,
+        authorization: `Bearer ${accessToken}`,
       },
     });
     const data = await response.json();
@@ -335,7 +333,7 @@ const Example = memo(({ projects, setProjects }) => {
           table={table}
         />
 
-        {isFetchingAssignees && (
+        {(isFetchingAssignees || isFetchingProjects) && (
           <div
             style={{
               position: "absolute",
@@ -447,9 +445,17 @@ const Example = memo(({ projects, setProjects }) => {
 
 //Date Picker Imports - these should just be in your Context Provider
 
-export const ExampleWithLocalizationProvider = ({ projects, setProjects }) => (
+export const ExampleWithLocalizationProvider = ({
+  projects,
+  setProjects,
+  isFetchingProjects,
+}) => (
   //App.tsx or AppProviders file
   <LocalizationProvider dateAdapter={AdapterDayjs}>
-    <Example projects={projects} setProjects={setProjects} />
+    <Example
+      projects={projects}
+      setProjects={setProjects}
+      isFetchingProjects={isFetchingProjects}
+    />
   </LocalizationProvider>
 );

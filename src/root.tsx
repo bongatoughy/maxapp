@@ -1,9 +1,9 @@
-import React, { memo } from "react";
+import React from "react";
 import LoginForm from "./login-form";
 import { useAuth } from "./AuthContext";
 import { Home } from "./home";
 
-export const Root = memo(() => {
+export const Root = () => {
   const { isAuthenticated } = useAuth();
 
   return (
@@ -12,4 +12,4 @@ export const Root = memo(() => {
       {isAuthenticated && <Home />}
     </>
   );
-});
+};

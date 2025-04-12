@@ -14,8 +14,24 @@ import Lock from "@mui/icons-material/Lock";
 import CheckCircle from "@mui/icons-material/CheckCircle";
 import { signIn, signUp, confirmUser } from "./auth-service"; // Make sure confirmUser is available
 import { useAuth } from "./AuthContext";
+import Close from "@mui/icons-material/Close";
+import { Navigate } from "react-router";
 
-const Auth = memo(() => {
+const AuthButton = ({ text }) => {
+  return (
+    <Button
+      type="submit"
+      variant="contained"
+      fullWidth
+      sx={{ mt: 4, padding: 2, borderRadius: "10px" }}
+      startIcon={<CheckCircle />}
+    >
+      {text}
+    </Button>
+  );
+};
+
+const Auth = memo(({ isLoginOpen, setIsLoginOpen }) => {
   const [tab, setTab] = useState(0); // 0 = SignUp, 1 = SignIn
   const [stage, setStage] = useState("signup"); // Manage the stage of the process
   const [email, setEmail] = useState("");
@@ -54,6 +70,7 @@ const Auth = memo(() => {
       login(tokens.tokens.accessToken);
 
       setStatus({ success: "Sign in successful!", error: "" });
+      return <Navigate to="/home"></Navigate>;
     } catch (err) {
       setStatus({ error: err.message, success: "" });
     }
@@ -72,9 +89,23 @@ const Auth = memo(() => {
     }
   };
 
+  const onClickCloseDialog = () => {
+    setIsLoginOpen(false);
+  };
+
   return (
     <Container maxWidth="sm">
-      <Box sx={{ mt: 8, p: 4, border: "1px solid #ccc", borderRadius: 2 }}>
+      <Box sx={{ mt: 4, p: 4, border: "1px solid #ccc", borderRadius: 2 }}>
+        <Close
+          onClick={onClickCloseDialog}
+          sx={{
+            cursor: "pointer",
+            padding: 3,
+            position: "absolute",
+            top: 0,
+            right: 0,
+          }}
+        />
         <Tabs value={tab} onChange={handleTabChange} centered>
           <Tab label="Sign Up" />
           <Tab label="Sign In" />
@@ -135,15 +166,7 @@ const Auth = memo(() => {
                 }}
                 required
               />
-              <Button
-                type="submit"
-                variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
-                startIcon={<CheckCircle />}
-              >
-                Sign Up
-              </Button>
+              <AuthButton text={"Sign Up"}></AuthButton>
             </form>
           ) : (
             // Confirmation Code Form after successful Sign Up
@@ -206,15 +229,7 @@ const Auth = memo(() => {
               }}
               required
             />
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              sx={{ mt: 2 }}
-              startIcon={<CheckCircle />}
-            >
-              Sign In
-            </Button>
+            <AuthButton text={"Sign In"}></AuthButton>
           </form>
         )}
       </Box>

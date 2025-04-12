@@ -6,14 +6,18 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { useAuth } from "./AuthContext";
+import { SESSION_STORAGE_ACCESS_TOKEN_KEY, useAuth } from "./AuthContext";
+import Box from "@mui/material/Box";
+import { Navigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const LAMBDA_CREATE_PROJECT_URL =
   "https://hlgfcq5tqeuvbo54vu2sssdboi0qxzlb.lambda-url.us-east-1.on.aws/";
 
 export const FormDialog = React.memo(({ projects, setProjects }) => {
   const [open, setOpen] = React.useState(false);
-  const { tokens } = useAuth();
+  const { accessToken } = useAuth();
+  const navigate = useNavigate();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -23,8 +27,13 @@ export const FormDialog = React.memo(({ projects, setProjects }) => {
     setOpen(false);
   };
 
+  const handleOnClickSpreadsheet = () => {
+    navigate("/spreadsheet");
+  };
+
   const createNewProject = async (formJson) => {
-    const accessToken = sessionStorage.getItem("auth") || "";
+    // const accessToken =
+    //   sessionStorage.getItem(SESSION_STORAGE_ACCESS_TOKEN_KEY) || "";
 
     console.log({ accessToken, formJson });
 
@@ -48,9 +57,22 @@ export const FormDialog = React.memo(({ projects, setProjects }) => {
   };
 
   return (
-    <React.Fragment>
-      <Button variant="contained" color="secondary" onClick={handleClickOpen}>
+    <Box sx={{ display: "flex", justifyContent: "center" }}>
+      <Button
+        sx={{ my: 2 }}
+        variant="contained"
+        color="secondary"
+        onClick={handleClickOpen}
+      >
         Add New Project
+      </Button>
+      <Button
+        sx={{ my: 2 }}
+        variant="contained"
+        color="primary"
+        onClick={handleOnClickSpreadsheet}
+      >
+        Spreadsheet Example
       </Button>
       <Dialog
         open={open}
@@ -89,6 +111,6 @@ export const FormDialog = React.memo(({ projects, setProjects }) => {
           <Button type="submit">Submit</Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
+    </Box>
   );
 });

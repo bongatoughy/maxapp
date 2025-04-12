@@ -8,18 +8,21 @@ const FETCH_PROJECTS_URL = `https://khip7gmzgqkn4flgpd3s7vzske0wmaot.lambda-url.
 
 export const Home = memo(() => {
   const [projects, setProjects] = useState([]);
-  const { tokens } = useAuth();
+  const [isFetchingProjects, setIsFetchingProjects] = useState(false);
+  const { accessToken } = useAuth();
 
   useEffect(() => {
     const fetchProjects = async () => {
+      setIsFetchingProjects(true);
       const resp = await fetch(FETCH_PROJECTS_URL, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${tokens}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       const json = await resp.json();
       setProjects(json);
+      setIsFetchingProjects(false);
     };
     fetchProjects();
   }, []);
@@ -31,6 +34,7 @@ export const Home = memo(() => {
       <ExampleWithLocalizationProvider
         projects={projects}
         setProjects={setProjects}
+        isFetchingProjects={isFetchingProjects}
       />
     </>
   );
